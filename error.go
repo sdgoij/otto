@@ -116,6 +116,11 @@ func catchPanic(function func()) (err error) {
 					err = errors.New("Here be dragons!")
 				}
 				return
+			case error:
+				if caught == ErrHalt {
+					err = caught
+				}
+				return
 			}
 			panic(caught)
 		}

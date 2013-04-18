@@ -2,6 +2,7 @@ package otto
 
 import (
 	"fmt"
+	"runtime"
 )
 
 func (self *_runtime) evaluateBody(list []_node) Value {
@@ -34,6 +35,13 @@ func (self *_runtime) evaluate(node _node) Value {
 			panic(caught)
 		}
 	}()
+
+	runtime.Gosched()
+	select {
+	case <-self.halt:
+		panic(ErrHalt)
+	default:
+	}
 
 	switch node := node.(type) {
 

@@ -106,8 +106,14 @@ JavaScript considers a vertical tab (\000B <VT>) to be part of the whitespace cl
 package otto
 
 import (
+	"errors"
 	"fmt"
 	"github.com/robertkrimen/otto/registry"
+	"time"
+)
+
+var (
+	ErrHalt = errors.New("execution was taking too long")
 )
 
 // Otto is the representation of the JavaScript runtime. Each instance of Otto has a self-contained namespace.
@@ -152,6 +158,23 @@ func (self Otto) Run(source string) (Value, error) {
 		result = self.runtime.GetValue(result)
 	}
 	return result, err
+}
+
+// RunUntil will run the given source with a time limit
+//
+// If the runtime is unable to finish execution within the given time, an ErrHalt error
+// will be returned.
+func (self Otto) RunUntil(source string, until time.Duration) (Value, error) {
+	self.runtime.halt = make(chan bool)
+	go func() {
+		time.Sleep(until)
+		self.runtime.halt <- true
+	}()
+	time.Sleep(time.Second)
+	defer func() {
+		self.runtime.halt = nil
+	}()
+	return self.Run(source)
 }
 
 func (self Otto) run(run interface{}) Value {

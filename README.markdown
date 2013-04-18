@@ -107,6 +107,12 @@ JavaScript considers a vertical tab (\000B <VT>) to be part of the whitespace cl
 
 ## Usage
 
+```go
+var (
+	ErrHalt = errors.New("execution was taking too long")
+)
+```
+
 #### type FunctionCall
 
 ```go
@@ -263,6 +269,16 @@ and error (if any)
 
 If the runtime is unable to parse the source, then this function will return
 undefined and the parse error (nothing will be evaluated in this case).
+
+#### func (Otto) RunUntil
+
+```go
+func (self Otto) RunUntil(source string, until time.Duration) (Value, error)
+```
+RunUntil will run the given source with a time limit
+
+If the runtime is unable to finish execution within the given time, an ErrHalt
+error will be returned.
 
 #### func (Otto) Set
 
