@@ -148,6 +148,11 @@ sub newContext {
                 "hasOwnProperty", 1,
                 "isPrototypeOf", 1,
                 "propertyIsEnumerable", 1,
+                # Deprecated but still widely used, non-standard, Mozilla extensions
+                "__defineGetter__", 1,
+                "__defineSetter__", 1,
+                "__lookupGetter__", 1,
+                "__lookupSetter__", 1,
             );
             my @propertyMap = $self->propertyMap(
                 @got,

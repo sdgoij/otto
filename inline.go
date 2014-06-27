@@ -164,6 +164,98 @@ func _newContext(runtime *_runtime) {
 				call: builtinObject_propertyIsEnumerable,
 			},
 		}
+		__defineGetter___function := &_object{
+			runtime:     runtime,
+			class:       "Function",
+			objectClass: _classObject,
+			prototype:   runtime.global.FunctionPrototype,
+			extensible:  true,
+			property: map[string]_property{
+				"length": _property{
+					mode: 0,
+					value: Value{
+						kind:  valueNumber,
+						value: 1,
+					},
+				},
+			},
+			propertyOrder: []string{
+				"length",
+			},
+			value: _nativeFunctionObject{
+				name: "__defineGetter__",
+				call: builtinObject___defineGetter__,
+			},
+		}
+		__defineSetter___function := &_object{
+			runtime:     runtime,
+			class:       "Function",
+			objectClass: _classObject,
+			prototype:   runtime.global.FunctionPrototype,
+			extensible:  true,
+			property: map[string]_property{
+				"length": _property{
+					mode: 0,
+					value: Value{
+						kind:  valueNumber,
+						value: 1,
+					},
+				},
+			},
+			propertyOrder: []string{
+				"length",
+			},
+			value: _nativeFunctionObject{
+				name: "__defineSetter__",
+				call: builtinObject___defineSetter__,
+			},
+		}
+		__lookupGetter___function := &_object{
+			runtime:     runtime,
+			class:       "Function",
+			objectClass: _classObject,
+			prototype:   runtime.global.FunctionPrototype,
+			extensible:  true,
+			property: map[string]_property{
+				"length": _property{
+					mode: 0,
+					value: Value{
+						kind:  valueNumber,
+						value: 1,
+					},
+				},
+			},
+			propertyOrder: []string{
+				"length",
+			},
+			value: _nativeFunctionObject{
+				name: "__lookupGetter__",
+				call: builtinObject___lookupGetter__,
+			},
+		}
+		__lookupSetter___function := &_object{
+			runtime:     runtime,
+			class:       "Function",
+			objectClass: _classObject,
+			prototype:   runtime.global.FunctionPrototype,
+			extensible:  true,
+			property: map[string]_property{
+				"length": _property{
+					mode: 0,
+					value: Value{
+						kind:  valueNumber,
+						value: 1,
+					},
+				},
+			},
+			propertyOrder: []string{
+				"length",
+			},
+			value: _nativeFunctionObject{
+				name: "__lookupSetter__",
+				call: builtinObject___lookupSetter__,
+			},
+		}
 		runtime.global.ObjectPrototype.property = map[string]_property{
 			"valueOf": _property{
 				mode: 0101,
@@ -207,6 +299,34 @@ func _newContext(runtime *_runtime) {
 					value: propertyIsEnumerable_function,
 				},
 			},
+			"__defineGetter__": _property{
+				mode: 0101,
+				value: Value{
+					kind:  valueObject,
+					value: __defineGetter___function,
+				},
+			},
+			"__defineSetter__": _property{
+				mode: 0101,
+				value: Value{
+					kind:  valueObject,
+					value: __defineSetter___function,
+				},
+			},
+			"__lookupGetter__": _property{
+				mode: 0101,
+				value: Value{
+					kind:  valueObject,
+					value: __lookupGetter___function,
+				},
+			},
+			"__lookupSetter__": _property{
+				mode: 0101,
+				value: Value{
+					kind:  valueObject,
+					value: __lookupSetter___function,
+				},
+			},
 			"constructor": _property{
 				mode:  0101,
 				value: Value{},
@@ -219,6 +339,10 @@ func _newContext(runtime *_runtime) {
 			"hasOwnProperty",
 			"isPrototypeOf",
 			"propertyIsEnumerable",
+			"__defineGetter__",
+			"__defineSetter__",
+			"__lookupGetter__",
+			"__lookupSetter__",
 			"constructor",
 		}
 	}
