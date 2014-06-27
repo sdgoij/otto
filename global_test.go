@@ -88,7 +88,7 @@ func TestGlobal(t *testing.T) {
 		// __defineGetter__,__defineSetter__,__lookupGetter__,__lookupSetter__,constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf
 		test(`
             Object.getOwnPropertyNames(Object.prototype).sort();
-        `, "constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf")
+        `, "__proto__,constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf")
 
 		// arguments,caller,length,name,prototype
 		test(`

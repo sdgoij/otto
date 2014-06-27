@@ -637,3 +637,17 @@ func TestProperty(t *testing.T) {
 		is(property.writeSet(), false)
 	})
 }
+
+func TestObject___proto__(t *testing.T) {
+	tt(t, func() {
+		test, _ := test()
+		test(`raise: Object.preventExtensions({}).__proto__ = {}`, "TypeError")
+		test(`
+            function Person() {};
+            var burt = new Person();
+            var a = burt.__proto__ === Person.prototype;
+            burt.__proto__ = Object.prototype;
+            [a, burt.__proto__ !== Person.prototype];
+        `, "true,true")
+	})
+}

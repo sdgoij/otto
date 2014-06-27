@@ -50,6 +50,26 @@ func newContext() *_runtime {
 
 	_newContext(self)
 
+	self.global.ObjectPrototype.defineOwnProperty("__proto__", _property{
+		_propertyGetSet{
+			self.newNativeFunction("", func(call FunctionCall) Value {
+				return toValue(call.thisObject().prototype)
+			}),
+			self.newNativeFunction("", func(call FunctionCall) Value {
+				checkObjectCoercible(call.runtime, call.This)
+				if proto := call.Argument(0); proto.IsObject() || proto.IsNull() {
+					this := call.thisObject()
+					if !this.extensible {
+						panic(self.panicTypeError())
+					}
+					this.prototype = proto._object()
+				}
+				return UndefinedValue()
+			}),
+		},
+		0101,
+	}, false)
+
 	self.eval = self.globalObject.property["eval"].value.(Value).value.(*_object)
 	self.globalObject.prototype = self.global.ObjectPrototype
 
