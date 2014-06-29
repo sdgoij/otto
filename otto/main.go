@@ -10,7 +10,10 @@ import (
 	"github.com/robertkrimen/otto/underscore"
 )
 
-var flag_underscore *bool = flag.Bool("underscore", true, "Load underscore into the runtime environment")
+var (
+	flag_underscore *bool = flag.Bool("underscore", true, "Load underscore into the runtime environment")
+	flag_repl       *bool = flag.Bool("i", false, "Start Otto in interactive mode (REPL)")
+)
 
 func readSource(filename string) ([]byte, error) {
 	if filename == "" || filename == "-" {
@@ -27,13 +30,14 @@ func main() {
 	}
 
 	err := func() error {
-		src, err := readSource(flag.Arg(0))
-		if err != nil {
-			return err
-		}
-
 		vm := otto.New()
-		_, err = vm.Run(src)
+		if *flag_repl {
+			return NewREPL(vm).Run()
+		}
+		src, err := readSource(flag.Arg(0))
+		if err == nil {
+			_, err = vm.Run(src)
+		}
 		return err
 	}()
 	if err != nil {
