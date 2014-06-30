@@ -18,10 +18,11 @@ const err_UnexpectedEndOfInput = "Unexpected end of input"
 type repl struct {
 	vm  *otto.Otto
 	tty *term.TTY
+	h   []string
 }
 
 func NewREPL(vm *otto.Otto) repl {
-	return repl{vm, term.NewTTY(os.Stdin)}
+	return repl{vm, term.NewTTY(os.Stdin), make([]string, 1)}
 }
 
 func (r repl) Run() error {
@@ -48,23 +49,56 @@ func (r repl) Run() error {
 		switch in := string(linebuf[:n]); in {
 		// Quit on ":quit", ^C, and ^D
 		case ":quit", term.Interrupt, term.EndOfFile:
-			io.WriteString(os.Stdout, "\r\nGoodbye!\r\n")
+			io.WriteString(r.tty, "\r\nGoodbye!\r\n")
 			return nil
 		case term.CarriageReturn, term.NewLine:
-			if r, err := r.vm.Run(strings.Trim(expr, " \t")); nil != err {
-				if err := perr(err); nil != err && err.Message == err_UnexpectedEndOfInput {
-					// Unexpected end of input, continue and see if the next line completes
-					// the expression.
-					continue
+			if expr = strings.Trim(expr, " \t"); len(expr) > 0 {
+				if value, err := r.vm.Run(expr); nil != err {
+					if err := perr(err); nil != err && err.Message == err_UnexpectedEndOfInput {
+						// Unexpected end of input, continue and see if the next line completes
+						// the expression.
+						continue
+					}
+					io.WriteString(r.tty, err.Error()+"\r\n")
+				} else {
+					io.WriteString(r.tty, fmt.Sprintf(
+						">>>>> %s\r\n", value.String()))
+					r.h = append(r.h, expr)
 				}
-				fmt.Printf("%s (%T)\r\n", err, err)
-			} else {
-				fmt.Println(">>>>>", r, "\r")
+				expr = ""
 			}
-			expr = ""
 			r.prompt()
 		default:
-			expr += in
+			if strings.IndexByte(in, ':') == 0 {
+				switch cmd := strings.Split(in, " "); cmd[0] {
+				case ":help", ":h", ":?":
+					io.WriteString(r.tty, "Available commands:\r\n\r\n"+
+						"\t:help, :h, or :? - Show this help message\r\n"+
+						"\t:load <file>     - Load JavaScript file\r\n"+
+						"\t:dump [<file>]   - Dump REPL history to <file> or stdout\r\n"+
+						"\r\n")
+				case ":load":
+					if len(cmd) < 2 {
+						io.WriteString(r.tty, "Please tell me what file to load.\r\n")
+					}
+					if src, err := readSource(cmd[1]); err == nil {
+						if _, err = r.vm.Run(src); nil == err {
+							continue
+						}
+					} else {
+						io.WriteString(r.tty, err.Error()+"\r\n")
+					}
+				case ":dump":
+					if err := dump(cmd, r.h); err != nil {
+						io.WriteString(r.tty, err.Error()+"\r\n")
+					}
+				default:
+					io.WriteString(r.tty, fmt.Sprintf(
+						"Unknown command '%s'\r\n", cmd[0]))
+				}
+			} else {
+				expr += in
+			}
 		}
 	}
 }
@@ -90,4 +124,24 @@ func perr(e error) (err *parser.Error) {
 		err = t
 	}
 	return
+}
+
+func dump(cmd []string, history []string) error {
+	var w io.Writer = os.Stdout
+	var nl string = "\r\n"
+	if len(cmd) > 1 {
+		fp, err := os.OpenFile(cmd[1], os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+		if err != nil {
+			return err
+		}
+		defer fp.Close()
+		nl = "\n"
+		w = fp
+	}
+	for _, l := range history {
+		if _, err := io.WriteString(w, l+nl); err != nil {
+			return err
+		}
+	}
+	return nil
 }
